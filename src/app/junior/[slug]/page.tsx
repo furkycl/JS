@@ -4,8 +4,13 @@ import { juniorModules } from "@/content/levels";
 
 type Params = { params: { slug: string } };
 
+export function generateStaticParams() {
+  return juniorModules.map((m) => ({ slug: m.slug }));
+}
+
 export default function Page({ params }: Params) {
-  const mod = juniorModules.find((m) => m.slug === params.slug);
+  const slug = decodeURIComponent(params.slug).toLowerCase();
+  const mod = juniorModules.find((m) => m.slug.toLowerCase() === slug);
   if (!mod) {
     return (
       <div className="space-y-3">
@@ -29,4 +34,3 @@ export default function Page({ params }: Params) {
     </div>
   );
 }
-
