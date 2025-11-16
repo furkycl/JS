@@ -5,6 +5,9 @@ import { juniorModules } from "@/content/levels";
 
 type Params = { params: { slug: string } };
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
 export function generateStaticParams() {
   return juniorModules.map((m) => ({ slug: m.slug }));
 }
