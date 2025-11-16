@@ -3,7 +3,7 @@ import ModuleDetail from "@/components/ModuleDetail";
 import { redirect } from "next/navigation";
 import { juniorModules } from "@/content/levels";
 
-type Params = { params: { slug: string } };
+type Params = { params: Promise<{ slug: string }> };
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -12,8 +12,9 @@ export function generateStaticParams() {
   return juniorModules.map((m) => ({ slug: m.slug }));
 }
 
-export default function Page({ params }: Params) {
-  const raw = decodeURIComponent(params.slug);
+export default async function Page({ params }: Params) {
+  const { slug: rawParam } = await params;
+  const raw = decodeURIComponent(rawParam);
   const norm = (s: string) =>
     s
       .toLowerCase()
