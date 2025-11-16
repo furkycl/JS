@@ -1,9 +1,18 @@
-import LevelPage from "@/components/LevelPage";
+import TopicGrid from "@/components/TopicGrid";
 import { midIntro, midModules } from "@/content/levels";
 
 export default function Page() {
   return (
-    <LevelPage title="Mid Level" intro={midIntro} modules={midModules} />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          Mid Level
+        </h1>
+        <p className="mt-2 max-w-3xl text-zinc-600 dark:text-zinc-400">
+          {midIntro}
+        </p>
+      </div>
+      <TopicGrid basePath="/mid" modules={midModules} />
+    </div>
   );
 }
-

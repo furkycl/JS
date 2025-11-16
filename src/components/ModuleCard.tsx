@@ -4,6 +4,8 @@ export type Topic = {
   title: string;
   explanation: string;
   code: string;
+  notes?: string[];
+  moreExamples?: string[];
 };
 
 export type Module = {
@@ -43,4 +45,3 @@ export default function ModuleCard({ mod, index }: Props) {
     </article>
   );
 }
-

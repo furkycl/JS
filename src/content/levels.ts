@@ -20,6 +20,14 @@ count += 1;
 
 // var is function-scoped and hoisted; avoid
 // var legacy = 42;`,
+        notes: [
+          "const, referansı değil değeri sabitler; nesne/array içini değiştirebilirsiniz.",
+          "var fonksiyon kapsamlıdır ve hoisting yüzünden beklenmedik davranışlara yol açar.",
+          "let blok kapsamlıdır; tekrar tanımlamaya izin vermez (re-declare).",
+        ],
+        moreExamples: [
+          `const settings = { theme: 'dark' }\nsettings.theme = 'light'; // ok\n// settings = {} // TypeError: Assignment to constant variable`,
+        ],
       },
       {
         title: "Primitives vs objects",
@@ -34,6 +42,13 @@ const obj1 = { x: 1 };
 const obj2 = obj1; // reference copy
 obj2.x = 2;
 console.log(obj1.x); // 2`,
+        notes: [
+          "Primitives (string, number, boolean, null, undefined, symbol, bigint) değerdir.",
+          "Objeler ve diziler referanstır; kopyalamak için spread veya structuredClone kullanın.",
+        ],
+        moreExamples: [
+          `const arr1 = [1,2];\nconst arr2 = arr1;\narr2.push(3);\nconsole.log(arr1); // [1,2,3]`,
+        ],
       },
       {
         title: "Truthiness & equality",
@@ -49,6 +64,10 @@ console.log('0' == 0, '0' === 0); // true, false
 // Avoid loose equality corner cases
 console.log(null == undefined); // true (loose)
 console.log(null === undefined); // false (strict)`,
+        notes: [
+          "Her zaman === ve !== tercih edin; çift eşittir nadir, kontrollü durumlarda kullanılmalı.",
+          "Boş array [], boş obje {} truthy'dir; koşullarda dikkatli olun.",
+        ],
       },
     ],
   },
@@ -65,6 +84,10 @@ console.log(null === undefined); // false (strict)`,
         code: `function add(a, b) { return a + b }
 const mul = (a, b) => a * b;
 console.log(add(2, 3), mul(2, 3)); // 5, 6`,
+        notes: [
+          "Function declaration hoisted olduğu için dosyanın ilerisinde de çağrılabilir.",
+          "Arrow fonksiyonlar kısa callback'lerde idealdir; kendi this bağlamları yoktur.",
+        ],
       },
       {
         title: "Defaults & rest",
@@ -73,6 +96,13 @@ console.log(add(2, 3), mul(2, 3)); // 5, 6`,
         code: `function greet(name = "friend") { return \`Hello, \${name}!\` }
 function sum(...nums) { return nums.reduce((a, n) => a + n, 0) }
 console.log(greet(), sum(1,2,3));`,
+        notes: [
+          "Default parametreler yalnızca argüman undefined olduğunda devreye girer.",
+          "Rest parametreleri gerçek bir dizi döndürür; arguments objesinden daha kullanışlıdır.",
+        ],
+        moreExamples: [
+          `function parsePort(v = '3000'){ return Number(v) }\nconsole.log(parsePort(), parsePort('8080'));`,
+        ],
       },
       {
         title: "Arrow functions & this",
@@ -103,6 +133,10 @@ obj.incLater();
         code: `const user = { id: 1, name: "Ada", city: "London" };
 const { name, ...rest } = user; // rest = { id, city }
 const copy = { ...user, city: "Paris" };`,
+        notes: [
+          "Destructuring ile eksik alanlara varsayılan atayabilirsiniz: const {x = 0} = obj;",
+          "Spread sırası önemlidir; sağdaki değer soldakileri ezer.",
+        ],
       },
       {
         title: "Map/Filter/Reduce",
@@ -113,6 +147,13 @@ const doubled = nums.map(n => n*2);
 const evens = nums.filter(n => n%2===0);
 const sum = nums.reduce((a,n)=>a+n,0);
 console.log(doubled, evens, sum);`,
+        notes: [
+          "map/filter orijinal diziyi değiştirmez; immutability için idealdir.",
+          "reduce başlangıç değeri vermek (0) hataları önler.",
+        ],
+        moreExamples: [
+          `const words = ['a','bb','ccc'];\nconst totalLen = words.reduce((a,w)=>a+w.length,0);`,
+        ],
       },
       {
         title: "Mutation vs immutability",
@@ -146,12 +187,19 @@ const renamed = { ...user, name: 'Grace' };`,
   if (age < 18) return false;
   return true;
 }`,
+        notes: [
+          "Erken dön (early return) ile iç içe if bloklarını azaltın.",
+          "Karmaşık koşulları iyi isimlendirilmiş yardımcı fonksiyonlara çıkarın.",
+        ],
       },
       {
         title: "Looping",
         explanation: "for..of is great for arrays; for..in is for keys.",
         code: `for (const ch of "JS") console.log(ch);
 for (const [i, v] of ["a","b"].entries()) console.log(i, v);`,
+        notes: [
+          "for..of iterable'lar için uygundur; for..in anahtarları döner ve objelerde kullanılır.",
+        ],
       },
       {
         title: "Object lookup over switch",
@@ -177,11 +225,17 @@ log('warn', 'Heads up');`,
         title: "Templates & padStart",
         explanation: "Template literals and padding simplify formatting.",
         code: "`ID-${String(42).padStart(5, '0')}` // ID-00042",
+        notes: [
+          "Template literal ile satır içi değişken yerleştirme ve çok satırlı string yazabilirsiniz.",
+        ],
       },
       {
         title: "Parsing & rounding",
         explanation: "Number() beats parseInt for strict numeric conversion.",
         code: `Number("2.5") // 2.5\nMath.round(2.49) // 2\nMath.ceil(2.01) // 3`,
+        notes: [
+          "parseInt ikinci argüman olarak radix ister; Number daha sık tercih edilir.",
+        ],
       },
       {
         title: "NaN, finite, and parsing",
@@ -213,6 +267,10 @@ Number('08') // 8`,
 btn?.addEventListener('click', () => {
   console.log('Clicked!');
 });`,
+        notes: [
+          "Optional chaining (?.) ile null güvenli erişim sağlayın.",
+          "Tekrarlı manipülasyonlarda reflow/repainte dikkat edin; sınıf ekleyip çıkarma tercih edin.",
+        ],
       },
       {
         title: "Creating & inserting",
@@ -260,6 +318,10 @@ export const midModules: Module[] = [
   return new Promise((res) => setTimeout(res, ms));
 }
 wait(200).then(() => console.log('done'));`,
+        notes: [
+          "Promise executor senkron çalışır; içinde hata atarsanız otomatik reject olur.",
+          "Bir promise sadece bir kez settle olur (resolve/reject).",
+        ],
       },
       {
         title: "Errors & chaining",
@@ -279,6 +341,9 @@ wait(200).then(() => console.log('done'));`,
   fetch('/a'),
   fetch('/b')
 ]).then(([a, b]) => {/* ... */})`,
+        notes: [
+          "Promise.all ilk hata ile topluca reddeder; hepsinin sonucunu görmek için allSettled kullanın.",
+        ],
       },
       {
         title: "allSettled & race",
@@ -315,6 +380,9 @@ Promise.race([
     return null;
   }
 }`,
+        notes: [
+          "await ile atılan hataları try/catch ile yakalayın; finally bloklarında temizlik yapın.",
+        ],
       },
       {
         title: "Parallel awaits",
@@ -322,6 +390,9 @@ Promise.race([
         code: `const aP = fetch('/a');
 const bP = fetch('/b');
 const [a, b] = await Promise.all([aP, bP]);`,
+        notes: [
+          "Bağımsız istekleri paralel başlatmak toplam süreyi kısaltır.",
+        ],
       },
       {
         title: "Timeout & AbortController",
@@ -354,6 +425,10 @@ export function add(a,b){return a+b}
 export default function mul(a,b){return a*b}
 // usage
 import mul, { add } from './math.js';`,
+        notes: [
+          "Bir modülde yalnızca bir default export olabilir; isimlendirilmiş export birden fazla olabilir.",
+          "İsimlendirilmiş export/import otomatik refactor ve tree-shaking için daha uygundur.",
+        ],
       },
       {
         title: "Re-exports",
@@ -392,6 +467,9 @@ console.log(count); // 1`,
   static origin() { return new Point(0,0) }
 }
 console.log(Point.origin().dist());`,
+        notes: [
+          "static metotlar sınıfın üzerinde çağrılır; örnek (instance) üzerinde değil.",
+        ],
       },
       {
         title: "Extends",
@@ -427,6 +505,10 @@ console.log(u.firstInitial); // 'A'`,
         code: `class NotFoundError extends Error { constructor(m){ super(m) } }
 function get(id){ throw new NotFoundError('User not found') }
 try { get(1) } catch(e){ console.error(e.message) }`,
+        notes: [
+          "Error.name ve stack izleri hata ayıklamada yardımcıdır.",
+          "Alan eklemek isterseniz sınıfınıza own field'lar tanımlayın.",
+        ],
       },
       {
         title: "finally",
@@ -461,6 +543,9 @@ finally { unlock(); }`,
         code: `setTimeout(()=>console.log('timeout'));
 Promise.resolve().then(()=>console.log('microtask'));
 // logs: microtask, then timeout`,
+        notes: [
+          "Microtask kuyruğu (Promise callbacks) zamanlayıcılardan önce çalışır; sıralama önemliyse dikkate alın.",
+        ],
       },
       {
         title: "queueMicrotask",
@@ -492,6 +577,9 @@ export const seniorModules: Module[] = [
         code: `const arr = [1,2,2,3];
 const dedup = [...new Set(arr)]; // O(n)
 console.log(dedup);`,
+        notes: [
+          "İç içe döngüler genelde O(n^2) maliyet doğurur; veri yapılarıyla sadeleştirin.",
+        ],
       },
       {
         title: "Memoization",
@@ -534,6 +622,9 @@ console.log(max(hugeArray));`,
 }
 const logger = createLogger('warn');
 logger.log('Heads up');`,
+        notes: [
+          "Factory, kurulum detaylarını soyutlar ve testte mock'lamayı kolaylaştırır.",
+        ],
       },
       {
         title: "Strategy",
@@ -573,6 +664,9 @@ bus.emit('tick', 1);`,
         explanation: "Copy-on-write with spread keeps state predictable.",
         code: `const state = { items: [1,2] };
 const next = { ...state, items: [...state.items, 3] };`,
+        notes: [
+          "Referans eşitliğiyle değişiklik tespiti (shallow compare) daha kolay olur.",
+        ],
       },
       {
         title: "Composition",
@@ -646,6 +740,9 @@ expect(fn).toHaveBeenCalled();`,
         code: `// utils.js
 export const used = ()=>{};
 export const unused = ()=>{}; // dropped by DCE if unused`,
+        notes: [
+          "Yan etki içeren modüller tree-shake edilemez; sideEffects ayarı önemlidir.",
+        ],
       },
       {
         title: "Code splitting",
