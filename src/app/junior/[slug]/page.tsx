@@ -13,8 +13,18 @@ export function generateStaticParams() {
 }
 
 export default function Page({ params }: Params) {
-  const slug = decodeURIComponent(params.slug).toLowerCase();
-  const mod = juniorModules.find((m) => m.slug.toLowerCase() === slug);
+  const raw = decodeURIComponent(params.slug);
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-');
+  const slug = norm(raw);
+  const mod = juniorModules.find(
+    (m) => norm(m.slug) === slug || norm(m.title) === slug
+  );
   if (!mod) {
     // Fuzzy redirect for common typos (e.g., variablels -> variables)
     const distance = (a: string, b: string) => {
@@ -36,7 +46,7 @@ export default function Page({ params }: Params) {
       return dp[a.length][b.length];
     };
     const best = juniorModules
-      .map((m) => ({ m, d: distance(slug, m.slug.toLowerCase()) }))
+      .map((m) => ({ m, d: distance(slug, norm(m.slug)) }))
       .sort((a, b) => a.d - b.d)[0];
     if (best && best.d <= 3) {
       redirect(`/junior/${best.m.slug}`);
