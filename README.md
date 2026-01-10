@@ -13,6 +13,9 @@ Scripts
 - `npm run build`: Create a production build
 - `npm start`: Start the production server
 - `npm run lint`: Run ESLint
+- `npm run lint:fix`: Auto-fix lint issues where possible
+- `npm run type-check`: TypeScript type checking (no emit)
+- `npm run check`: Lint + type-check
 
 Pages
 - `/` — Landing (overview of tracks)
@@ -39,3 +42,19 @@ Next Steps (optional)
 - Add search/filter by topic
 - Add MDX support for rich content
 - Add dark mode toggle with persistence
+
+CI
+- GitHub Actions workflow runs on pushes/PRs to `main`:
+  - Lint, Type-check, and Build using Node from `.nvmrc`.
+
+Health Check
+- `GET /api/health` returns `{ ok: true }` for basic uptime checks.
+
+Contributing
+- See `CONTRIBUTING.md` for local setup, branching, and PR checklist.
+
+Türkçe (Kısa Özet)
+- Projeyi çalıştırmak için: `npm ci` ve ardından `npm run dev`.
+- Kod kalitesi komutları: `npm run lint`, `npm run type-check`, `npm run check`.
+- Basit sağlık kontrolü: `GET /api/health` (JSON `{ ok: true }`).
+- Katkıda bulunmak için `CONTRIBUTING.md` dosyasına göz atın.
