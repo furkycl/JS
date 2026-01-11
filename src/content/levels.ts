@@ -72,6 +72,114 @@ console.log(null === undefined); // false (strict)`,
     ],
   },
   {
+    slug: "scope-and-closures",
+    title: "Scope & Closures",
+    description:
+      "Learn block/function scope and how closures capture variables for later use.",
+    topics: [
+      {
+        title: "Block vs function scope",
+        explanation:
+          "let/const are block-scoped; var is function-scoped and hoisted.",
+        code: `{
+  let a = 1; const b = 2; var c = 3;
+}
+// a, b burada görünmez; c görünür (var function-scope)
+function f(){ var x = 1 }
+// x dışarıda görünmez`,
+        notes: [
+          "Modern JS'te var kullanmaktan kaçının; let/const tercih edin.",
+        ],
+      },
+      {
+        title: "Closure nedir?",
+        explanation:
+          "Closure, bir fonksiyonun tanımlandığı çevredeki değişkenlere erişimini korur.",
+        code: `function counter(){
+  let n = 0;
+  return () => ++n; // n'yi kapatır (capture)
+}
+const inc = counter();
+console.log(inc(), inc()); // 1, 2`,
+        notes: [
+          "Closure sayesinde private benzeri durumlar oluşturabilirsiniz.",
+        ],
+      },
+      {
+        title: "IIFE ve modül benzeri kullanımlar",
+        explanation:
+          "IIFE eski tarayıcılarda lokal scope yaratmak için kullanılır; bugün modüller tercih edilir.",
+        code: `(function(){
+  const secret = 'x';
+  console.log('init', secret);
+})(); // secret dışarı sızmaz`,
+      },
+    ],
+  },
+  {
+    slug: "this-and-binding",
+    title: "this & Binding",
+    description:
+      "this'in nasıl belirlendiğini ve call/apply/bind ile nasıl kontrol edildiğini öğrenin.",
+    topics: [
+      {
+        title: "Çağrı bağlamı",
+        explanation:
+          "this, fonksiyonun nasıl çağrıldığına göre belirlenir (obj.metod(), call/apply/bind).",
+        code: `function who(){ console.log(this.name) }
+const u = { name: 'Ada', who };
+u.who(); // Ada
+who(); // undefined (strict mode)`,
+      },
+      {
+        title: "call/apply/bind",
+        explanation: "this'i manuel verin ve argümanları aktarın.",
+        code: `function greet(g){ console.log(g, this.name) }
+const p = { name: 'Grace' };
+greet.call(p, 'Hi');
+greet.apply(p, ['Hello']);
+const hi = greet.bind(p, 'Hey'); hi();`,
+      },
+      {
+        title: "Arrow this",
+        explanation:
+          "Arrow fonksiyonlar lexical this yakalar; ctor/metotlar için normal fonksiyon kullanın.",
+        code: `const obj = {
+  n: 0,
+  incLater(){ setTimeout(() => { this.n++; console.log(this.n) }, 10); }
+};
+obj.incLater();`,
+      },
+    ],
+  },
+  {
+    slug: "array-methods-advanced",
+    title: "Array Methods Advanced",
+    description: "find/some/every, flat/flatMap ve sıralama",
+    topics: [
+      {
+        title: "find/some/every",
+        explanation: "Koşula uyanı bul, var mı yok mu kontrol et.",
+        code: `const users = [{id:1},{id:2}];
+users.find(u=>u.id===2); // {id:2}
+users.some(u=>u.id===3); // false
+users.every(u=>u.id>0); // true`,
+      },
+      {
+        title: "flat/flatMap",
+        explanation: "Tek seviyeyi düzleştir veya map+flat",
+        code: `[[1],[2,3]].flat(); // [1,2,3]
+[1,2,3].flatMap(n=>[n,n*2]); // [1,2,2,4,3,6]`,
+      },
+      {
+        title: "Sıralama",
+        explanation: "Karşılaştırma fonksiyonu ile kararlı sıralama",
+        code: `const arr = ['b','aa','c'];
+arr.sort((a,b)=>a.length-b.length || a.localeCompare(b)); // ['c','b','aa']`,
+      },
+    ],
+  },
+  {
     slug: "functions-and-parameters",
     title: "Functions & Parameters",
     description:
@@ -363,6 +471,66 @@ Promise.race([
     ],
   },
   {
+    slug: "fetch-and-http",
+    title: "Fetch & HTTP",
+    description: "GET/POST, hata durumları ve yeniden deneme (retry).",
+    topics: [
+      {
+        title: "Temel GET/POST",
+        explanation: "JSON isteği ve hata kontrolü",
+        code: `async function getUser(id){
+  const r = await fetch('/api/users/'+id);
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+async function createUser(data){
+  const r = await fetch('/api/users', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}`,
+      },
+      {
+        title: "Retry + backoff",
+        explanation: "Geçici hatalarda üstel backoff ile yeniden dene.",
+        code: `async function retry(fn, times=3){
+  let attempt = 0; let err;
+  while(attempt<times){
+    try { return await fn() } catch(e){ err=e; await new Promise(r=>setTimeout(r, 2**attempt*200)); attempt++; }
+  }
+  throw err;
+}
+const data = await retry(()=>getUser(1));`,
+      },
+      {
+        title: "JSON parse hataları",
+        explanation: "r.json() da hata atabilir; try/catch ile sarın.",
+        code: `async function safeJson(r){
+  try { return await r.json() } catch { return null }
+}`,
+      },
+    ],
+  },
+  {
+    slug: "async-iterators",
+    title: "Async Iterators",
+    description: "for-await-of, stream'lerden okuma ve üretici fonksiyonlar",
+    topics: [
+      {
+        title: "for-await-of",
+        explanation: "Asenkron kaynaklardan sırayla tüketim",
+        code: `async function* gen(){ yield 1; yield 2; }
+for await (const v of gen()) console.log(v);`,
+      },
+      {
+        title: "Fetch body stream",
+        explanation: "ReadableStream'i parça parça oku",
+        code: `const r = await fetch('/big');
+const reader = r.body?.getReader();
+let total = 0; while(reader){ const {value, done} = await reader.read(); if(done) break; total += value.byteLength; }`,
+      },
+    ],
+  },
+  {
     slug: "async-await",
     title: "Async/Await",
     description: "Write async code that reads like sync code.",
@@ -606,6 +774,63 @@ console.log('ms', performance.now() - t0);`,
         code: `// Instead of [...arr] repeatedly, pass references to read-only helpers
 function max(arr){ return arr.reduce((m,n)=>n>m?n:m, -Infinity); }
 console.log(max(hugeArray));`,
+      },
+    ],
+  },
+  {
+    slug: "concurrency-workers",
+    title: "Concurrency & Workers",
+    description: "Ağır işleri işçi (Web Worker) ile ana iş parçacığından ayırın.",
+    topics: [
+      {
+        title: "Basit Worker",
+        explanation: "Worker ile CPU yoğun iş yükünü taşıma",
+        code: `// worker.js
+self.onmessage = (e)=>{ const n=e.data; let s=0; for(let i=0;i<n;i++) s+=i; postMessage(s); };
+// main
+const w = new Worker('worker.js');
+w.onmessage = (e)=>console.log('sum', e.data);
+w.postMessage(1e7);`,
+      },
+      {
+        title: "Havuz (pool) fikri",
+        explanation: "Birden fazla worker ile iş kuyruğu dağıtımı",
+        code: `function createPool(size, url){
+  const idle = []; const busy = new Set();
+  for(let i=0;i<size;i++){ const w=new Worker(url); idle.push(w); }
+  return async function run(job){
+    const w = idle.pop() ?? await new Promise(r=>{
+      const t = setInterval(()=>{ if(idle.length){ clearInterval(t); r(idle.pop()); } },10);
+    });
+    busy.add(w);
+    const res = await new Promise((res)=>{ w.onmessage = (e)=>res(e.data); w.postMessage(job); });
+    busy.delete(w); idle.push(w); return res;
+  }
+}`,
+      },
+    ],
+  },
+  {
+    slug: "observability",
+    title: "Observability",
+    description: "Yapılandırılmış log, ölçüm ve izleme (tracing) giriş",
+    topics: [
+      {
+        title: "Yapılandırılmış log",
+        explanation: "JSON log'lar makine tarafından işlenebilir",
+        code: `function log(level, msg, extra={}){
+  console[level](JSON.stringify({ t:new Date().toISOString(), level, msg, ...extra }));
+}
+log('info','user-login',{ userId: 1 });`,
+      },
+      {
+        title: "performance.mark/measure",
+        explanation: "Kritik path ölçümü",
+        code: `performance.mark('start');
+// ... iş
+performance.mark('end');
+performance.measure('work','start','end');
+console.table(performance.getEntriesByName('work'));`,
       },
     ],
   },
