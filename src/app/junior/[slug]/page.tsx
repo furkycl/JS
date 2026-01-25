@@ -27,7 +27,6 @@ export default async function Page({ params }: Params) {
     (m) => norm(m.slug) === slug || norm(m.title) === slug
   );
   if (!mod) {
-    // Fuzzy redirect for common typos (e.g., variablels -> variables)
     const distance = (a: string, b: string) => {
       const dp: number[][] = Array(a.length + 1)
         .fill(0)
@@ -53,33 +52,34 @@ export default async function Page({ params }: Params) {
       redirect(`/junior/${best.m.slug}`);
     }
     return (
-      <div className="space-y-3">
-        <h1 className="text-xl font-semibold">Topic not found</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Available topics:
-        </p>
-        <ul className="list-disc pl-5 text-sm">
-          {juniorModules.map((m) => (
-            <li key={m.slug}>
-              <Link className="text-blue-600 underline" href={`/junior/${m.slug}`}>
-                {m.title}
+      <div className="max-w-2xl mx-auto p-8 text-center">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-bold mb-2">Modul Bulunamadi</h1>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-6">
+            Aradiginiz modul mevcut degil. Asagidaki modullerden birini secebilirsiniz:
+          </p>
+          <div className="grid gap-2 text-left">
+            {juniorModules.map((m) => (
+              <Link
+                key={m.slug}
+                href={`/junior/${m.slug}`}
+                className="flex items-center gap-3 p-3 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-sm font-bold">
+                  {juniorModules.indexOf(m) + 1}
+                </span>
+                <span className="font-medium">{m.title}</span>
               </Link>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
-  return (
-    <div className="space-y-4">
-      <nav className="text-sm text-zinc-600 dark:text-zinc-400">
-        <Link href="/junior" className="hover:underline">
-          Junior
-        </Link>
-        <span className="px-1">/</span>
-        <span className="text-zinc-900 dark:text-zinc-100">{mod.title}</span>
-      </nav>
-      <ModuleDetail mod={mod} />
-    </div>
-  );
+  return <ModuleDetail mod={mod} level="junior" />;
 }
