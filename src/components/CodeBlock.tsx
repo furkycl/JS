@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 type Props = {
   code: string;
@@ -73,7 +73,7 @@ export default function CodeBlock({ code, language = "js", showLineNumbers = tru
   const lines = trimmedCode.split("\n");
   const isLong = lines.length > 15;
 
-  const highlighted = useMemo(() => highlightCode(trimmedCode), [trimmedCode]);
+  const highlighted = highlightCode(trimmedCode);
 
   async function onCopy() {
     try {

@@ -111,7 +111,7 @@ export default function Home() {
           </h1>
 
           <p className="text-lg sm:text-xl text-zinc-300 max-w-2xl mb-8">
-            Junior'dan Senior'a, modern JavaScript'i adim adim ogren.
+            Junior seviyesinden Senior seviyesine, modern JavaScript&apos;i adim adim ogren.
             Pratik ornekler, interaktif kodlar ve ilerleme takibi ile.
           </p>
 

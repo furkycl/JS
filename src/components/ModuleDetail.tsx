@@ -193,6 +193,44 @@ function TopicSection({
   );
 }
 
+function SidebarLink({ topic, index, level, moduleSlug, config }: {
+  topic: Topic;
+  index: number;
+  level: string;
+  moduleSlug: string;
+  config: LevelConfig;
+}) {
+  const { isComplete } = useProgress();
+  const topicId = `${level}:${moduleSlug}:${index}`;
+  const completed = isComplete(topicId);
+
+  return (
+    <a
+      href={`#topic-${index}`}
+      className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
+        completed
+          ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+          : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+      }`}
+    >
+      <span className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
+        completed
+          ? "bg-emerald-500 text-white"
+          : `bg-gradient-to-br ${config.gradient} text-white`
+      }`}>
+        {completed ? (
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+        ) : (
+          index + 1
+        )}
+      </span>
+      <span className="truncate">{topic.title}</span>
+    </a>
+  );
+}
+
 export default function ModuleDetail({ mod, level }: Props) {
   const config = levelConfigs[level];
   const { getProgress } = useProgress();
@@ -260,38 +298,16 @@ export default function ModuleDetail({ mod, level }: Props) {
               Konular
             </span>
           </div>
-          {mod.topics.map((t, i) => {
-            const topicId = `${level}:${mod.slug}:${i}`;
-            const { isComplete } = useProgress();
-            const completed = isComplete(topicId);
-
-            return (
-              <a
-                key={i}
-                href={`#topic-${i}`}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
-                  completed
-                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                    : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                }`}
-              >
-                <span className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
-                  completed
-                    ? "bg-emerald-500 text-white"
-                    : `bg-gradient-to-br ${config.gradient} text-white`
-                }`}>
-                  {completed ? (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    i + 1
-                  )}
-                </span>
-                <span className="truncate">{t.title}</span>
-              </a>
-            );
-          })}
+          {mod.topics.map((t, i) => (
+            <SidebarLink
+              key={i}
+              topic={t}
+              index={i}
+              level={level}
+              moduleSlug={mod.slug}
+              config={config}
+            />
+          ))}
         </aside>
 
         {/* Topics */}

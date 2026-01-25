@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useSyncExternalStore } from "react";
 
 type ProgressContextType = {
   completedTopics: Set<string>;
@@ -13,22 +13,30 @@ const ProgressContext = createContext<ProgressContextType | null>(null);
 
 const STORAGE_KEY = "js-modules-progress";
 
-export function ProgressProvider({ children }: { children: ReactNode }) {
-  const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
-  const [mounted, setMounted] = useState(false);
+function useHasMounted() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
 
-  useEffect(() => {
+function getStoredTopics(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setCompletedTopics(new Set(parsed));
-      } catch {
-        // ignore
-      }
+      return new Set(JSON.parse(stored));
     }
-    setMounted(true);
-  }, []);
+  } catch {
+    // ignore
+  }
+  return new Set();
+}
+
+export function ProgressProvider({ children }: { children: ReactNode }) {
+  const mounted = useHasMounted();
+  const [completedTopics, setCompletedTopics] = useState<Set<string>>(() => getStoredTopics());
 
   useEffect(() => {
     if (mounted) {
@@ -54,7 +62,6 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const prefix = moduleSlug ? `${level}:${moduleSlug}:` : `${level}:`;
     const matchingTopics = [...completedTopics].filter((id) => id.startsWith(prefix));
 
-    // Get total topics from levels data
     const totalMap: Record<string, Record<string, number>> = {
       junior: {
         "variables-and-types": 3,
@@ -121,6 +128,5 @@ const defaultProgress: ProgressContextType = {
 
 export function useProgress() {
   const ctx = useContext(ProgressContext);
-  // Return default during SSR or when not wrapped in provider
   return ctx ?? defaultProgress;
 }
